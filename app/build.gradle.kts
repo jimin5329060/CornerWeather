@@ -49,6 +49,19 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    // ---- 第 15 章 天气 App 所需（View 体系） ----
+    implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.swiperefreshlayout)
+    implementation(libs.material)
+    // lifecycle-extensions 已废弃，用下面两个替代（ViewModel + LiveData）
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    // Retrofit + Gson（Gson 本身由 converter-gson 传递引入）
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+    // 协程：coroutines-core 由 coroutines-android 传递引入
+    implementation(libs.kotlinx.coroutines.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

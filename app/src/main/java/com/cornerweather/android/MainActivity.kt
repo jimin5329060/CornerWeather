@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
             CornerWeatherTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
-                        name = "Android",
+                        name = "Android Kotlin",
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
