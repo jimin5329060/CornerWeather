@@ -1,6 +1,7 @@
 package com.cornerweather.android.ui.place
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import androidx.fragment.app.Fragment
 import android.os.Bundle
 import android.util.Log
@@ -54,7 +55,14 @@ class PlaceFragment: Fragment() {
 
         placeAdapter = PlaceAdapter(viewModel.placeList){
             place -> Log.d("PlaceFragment", "Clicked place: ${place.name}, ${place.address}, Lat: ${place.location.lat}, Lng: ${place.location.lng}")
-//            hideKeyboard()
+//
+            val  intent = Intent(requireContext(), com.cornerweather.android.ui.weather.WeatherActivity::class.java).apply {
+                putExtra("location_lng", place.location.lng)
+                putExtra("location_lat", place.location.lat)
+                putExtra("place_name", place.name)
+            }
+            startActivity(intent)
+            hideKeyboard()
         }
 
         recyclerView.adapter = placeAdapter
