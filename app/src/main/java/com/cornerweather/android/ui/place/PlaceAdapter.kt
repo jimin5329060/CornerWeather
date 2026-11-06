@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.cornerweather.android.R
 import com.cornerweather.android.logic.model.Place
 
-class PlaceAdapter(private val placeList: List<Place>): RecyclerView.Adapter<PlaceAdapter.ViewHolder>() {
+class PlaceAdapter(private val placeList: List<Place>,private val onItemClick: (Place) -> Unit = {}): RecyclerView.Adapter<PlaceAdapter.ViewHolder>() {
 
     inner  class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
         val placeName:TextView = view.findViewById(R.id.placeName)
@@ -34,6 +34,9 @@ class PlaceAdapter(private val placeList: List<Place>): RecyclerView.Adapter<Pla
        holder.placeName.text = place.name
        holder.placeAddress.text = place.address
        holder.location.text = "Lat: ${place.location.lat}, Lng: ${place.location.lng}"
+       holder.itemView.setOnClickListener {
+            onItemClick(place)
+       }
     }
 
     override fun getItemCount() = placeList.size

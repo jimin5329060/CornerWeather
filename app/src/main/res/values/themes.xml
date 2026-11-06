@@ -4,4 +4,5 @@
     <!-- 引入 Material 库后，主题父类必须换成 Material3/MaterialComponents，
          否则 MaterialCardView、MaterialButton 等控件会在运行时崩 -->
     <style name="Theme.CornerWeather" parent="Theme.Material3.DayNight.NoActionBar" />
+
 </resources>
