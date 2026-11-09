@@ -3,6 +3,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
@@ -11,9 +12,13 @@ import android.widget.TextView
 import android.widget.Toast
 
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.cornerweather.android.R
 import com.cornerweather.android.logic.model.Weather
 import com.cornerweather.android.logic.model.getSky
@@ -31,6 +36,17 @@ class WeatherActivity : AppCompatActivity() {
         setContentView(
             R.layout.activity_weather
         )
+
+        // 全屏模式下内容会顶到状态栏，给标题区域补上状态栏高度的 padding，
+        // 否则城市名会被状态栏压住/挤出可视区
+        val titleLayout = findViewById<FrameLayout>(R.id.titleLayout)
+        val basePaddingTop = titleLayout.paddingTop
+        ViewCompat.setOnApplyWindowInsetsListener(titleLayout) { v, insets ->
+            val top = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+            v.updatePadding(top = basePaddingTop + top)
+            insets
+        }
+
         if (viewModel.locationLng.isEmpty()){
             viewModel.locationLng = intent.getStringExtra("location_lng") ?: ""
         }
@@ -42,7 +58,7 @@ class WeatherActivity : AppCompatActivity() {
         }
 
         Log.d("WeatherActivity", "Weather data: ${viewModel.locationLng}, ${viewModel.locationLat}, ${viewModel.placeName}")
-
+        val swipeRefresh:SwipeRefreshLayout = findViewById(R.id.swipeRefresh)
         viewModel.weatherLiveData.observe(this, Observer{
             result ->
             val  weather = result.getOrNull()
@@ -53,14 +69,23 @@ class WeatherActivity : AppCompatActivity() {
                 Toast.makeText(this,"无法成功获取天气信息",Toast.LENGTH_SHORT).show()
                 result.exceptionOrNull()?.printStackTrace()
             }
+            swipeRefresh.isRefreshing = false
 
         })
-
-        viewModel.refreshWeather(viewModel.locationLng,viewModel.locationLat)
-
+        swipeRefresh.setColorSchemeResources(R.color.colorPrimary)
+        refreshWeather(swipeRefresh)
+        swipeRefresh.setOnRefreshListener {
+            refreshWeather(swipeRefresh)
+        }
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = false
 
     }
+    fun  refreshWeather(swipeRefresh:SwipeRefreshLayout){
+
+        viewModel.refreshWeather(viewModel.locationLng,viewModel.locationLat)
+        swipeRefresh.isRefreshing = true
+    }
+    
 
     @SuppressLint("SetTextI18n")
     private fun showWeatherInfo(weather:Weather){

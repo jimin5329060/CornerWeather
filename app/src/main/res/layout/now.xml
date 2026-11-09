@@ -9,14 +9,14 @@
  <FrameLayout
      android:id="@+id/titleLayout"
      android:layout_width="match_parent"
-     android:fitsSystemWindows="true"
-     android:layout_height="90dp">
+     android:layout_height="wrap_content"
+     android:paddingTop="34dp"
+     android:paddingBottom="16dp">
      <TextView
        android:id="@+id/placeName"
        android:layout_width="match_parent"
-       android:layout_height="match_parent"
+       android:layout_height="wrap_content"
        android:gravity="center"
-       android:layout_marginTop="30dp"
        android:singleLine="true"
        android:ellipsize="middle"
        android:textColor="#fff"
