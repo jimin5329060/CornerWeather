@@ -1,6 +1,8 @@
 package com.cornerweather.android.logic
 import android.util.Log
 import androidx.lifecycle.liveData
+import com.cornerweather.android.logic.dao.PlaceDao
+import com.cornerweather.android.logic.model.Place
 import com.cornerweather.android.logic.model.Weather
 import com.cornerweather.android.logic.network.SunnyWeatherNetwork
 import kotlinx.coroutines.Dispatchers
@@ -8,6 +10,11 @@ import kotlinx.coroutines.delay
 import kotlin.coroutines.CoroutineContext
 
 object Repository {
+
+   fun savePlace(place:Place) = PlaceDao.savePlace(place)
+   fun getSavedPlace() = PlaceDao.getSavedPlace()
+   fun isPlaceSaved() = PlaceDao.isPlaceSaved()
+
    fun searchPlaces(query: String) = fire(Dispatchers.IO) {
        val placeResponse = SunnyWeatherNetwork.searchPlaces(query)
        if (placeResponse.status == "ok") {

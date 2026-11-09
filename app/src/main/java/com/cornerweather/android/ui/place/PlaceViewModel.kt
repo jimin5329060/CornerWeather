@@ -7,6 +7,9 @@ import com.cornerweather.android.logic.Repository
 import com.cornerweather.android.logic.model.Place
 
 class PlaceViewModel: ViewModel() {
+    fun savePlace(place: Place) = Repository.savePlace(place)
+    fun getSavedPlace() = Repository.getSavedPlace()
+    fun isPlaceSaved() = Repository.isPlaceSaved()
     private val searchLiveData = androidx.lifecycle.MutableLiveData<String>()
     val placeList = ArrayList<Place>()
     val placeLiveData: LiveData<Result<List<Place>>> = searchLiveData.switchMap { query ->

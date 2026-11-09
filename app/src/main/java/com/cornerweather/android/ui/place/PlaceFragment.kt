@@ -49,22 +49,32 @@ class PlaceFragment: Fragment() {
             v.updatePadding(bottom = bottom)
             insets
         }
+        if (viewModel.isPlaceSaved()){
+            val  place = viewModel.getSavedPlace()
+            val  intent = Intent(requireContext(), com.cornerweather.android.ui.weather.WeatherActivity::class.java).apply {
+                putExtra("location_lng", place!!.location.lng)
+                putExtra("location_lat", place.location.lat)
+                putExtra("place_name", place.name)
+            }
+            startActivity(intent)
+            activity?.finish()
+            return
+        }
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-
-
         placeAdapter = PlaceAdapter(viewModel.placeList){
-            place -> Log.d("PlaceFragment", "Clicked place: ${place.name}, ${place.address}, Lat: ${place.location.lat}, Lng: ${place.location.lng}")
+                place -> Log.d("PlaceFragment", "Clicked place: ${place.name}, ${place.address}, Lat: ${place.location.lat}, Lng: ${place.location.lng}")
 //
             val  intent = Intent(requireContext(), com.cornerweather.android.ui.weather.WeatherActivity::class.java).apply {
                 putExtra("location_lng", place.location.lng)
                 putExtra("location_lat", place.location.lat)
                 putExtra("place_name", place.name)
             }
+            viewModel.savePlace(place)
             startActivity(intent)
+//            activity?.finish()
             hideKeyboard()
         }
-
         recyclerView.adapter = placeAdapter
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -81,7 +91,7 @@ class PlaceFragment: Fragment() {
         }
         val searchPlaceEdit:EditText = view.findViewById(R.id.searchPlaceEdit)
         searchPlaceEdit.addTextChangedListener{
-            editable -> val content = editable.toString()
+                editable -> val content = editable.toString()
             Log.d("PlaceFragment", "Search content: $content")
             if (content.isNotEmpty()) {
                 viewModel.searchPlaces(content)
@@ -107,6 +117,7 @@ class PlaceFragment: Fragment() {
                 bgImageView.visibility = View.VISIBLE
             }
         }
+
     }
     private fun hideKeyboard() {
         ViewCompat.getWindowInsetsController(requireActivity().window.decorView)
