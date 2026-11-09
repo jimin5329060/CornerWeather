@@ -12,11 +12,19 @@ object SunnyWeatherNetwork {
         return suspendCancellableCoroutine { continuation ->
             enqueue(object : retrofit2.Callback<T> {
                 override fun onResponse(call: retrofit2.Call<T>, response: retrofit2.Response<T>) {
+                    if (!response.isSuccessful) {
+                        val error = response.errorBody()?.string()
+                        continuation.resumeWithException(
+                            RuntimeException("HTTP ${response.code()} ${response.message()} body=$error")
+                        )
+                        return
+                    }
                     val body = response.body()
-                    if (body != null) continuation.resume(body) {}
-                    else continuation.resumeWithException(
-                        RuntimeException("response body is null")
-                    )
+                    if (body != null) {
+                        continuation.resume(body) {}
+                    } else {
+                        continuation.resumeWithException(RuntimeException("response body is null"))
+                    }
                 }
 
                 override fun onFailure(call: retrofit2.Call<T>, t: Throwable) {
