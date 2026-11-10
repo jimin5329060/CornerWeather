@@ -13,14 +13,18 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.core.widget.addTextChangedListener
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cornerweather.android.MainActivity
 import com.cornerweather.android.R
+import com.cornerweather.android.ui.weather.WeatherActivity
 
 
 class PlaceFragment: Fragment() {
@@ -49,7 +53,9 @@ class PlaceFragment: Fragment() {
             v.updatePadding(bottom = bottom)
             insets
         }
-        if (viewModel.isPlaceSaved()){
+
+
+        if (activity is MainActivity && viewModel.isPlaceSaved()){
             val  place = viewModel.getSavedPlace()
             val  intent = Intent(requireContext(), com.cornerweather.android.ui.weather.WeatherActivity::class.java).apply {
                 putExtra("location_lng", place!!.location.lng)
@@ -58,21 +64,33 @@ class PlaceFragment: Fragment() {
             }
             startActivity(intent)
             activity?.finish()
-            return
         }
+
+
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         placeAdapter = PlaceAdapter(viewModel.placeList){
                 place -> Log.d("PlaceFragment", "Clicked place: ${place.name}, ${place.address}, Lat: ${place.location.lat}, Lng: ${place.location.lng}")
-//
-            val  intent = Intent(requireContext(), com.cornerweather.android.ui.weather.WeatherActivity::class.java).apply {
-                putExtra("location_lng", place.location.lng)
-                putExtra("location_lat", place.location.lat)
-                putExtra("place_name", place.name)
+            // 同一个 PlaceFragment 被两处复用：
+            // 1) MainActivity 首页 -> 新开一个天气页
+            // 2) WeatherActivity 抽屉里 -> 关抽屉 + 让宿主就地换地点刷新，别重复 startActivity
+            val weatherActivity = activity as? WeatherActivity
+            if (weatherActivity != null) {
+                Log.d("PlaceFragment", "WeatherActivity detected, updating location and refreshing weather.")
+                // DrawerLayout 在 Activity 的布局里，Fragment.findViewById 拿到的是 null
+                weatherActivity.findViewById<DrawerLayout>(R.id.drawerLayout)
+                    ?.closeDrawer(GravityCompat.START)
+                weatherActivity.updateWeather(place.location.lng, place.location.lat, place.name)
+            } else {
+                val  intent = Intent(requireContext(), WeatherActivity::class.java).apply {
+                    putExtra("location_lng", place.location.lng)
+                    putExtra("location_lat", place.location.lat)
+                    putExtra("place_name", place.name)
+                }
+                startActivity(intent)
+                activity?.finish()
             }
             viewModel.savePlace(place)
-            startActivity(intent)
-//            activity?.finish()
             hideKeyboard()
         }
         recyclerView.adapter = placeAdapter
@@ -117,6 +135,7 @@ class PlaceFragment: Fragment() {
                 bgImageView.visibility = View.VISIBLE
             }
         }
+
 
     }
     private fun hideKeyboard() {

@@ -1,17 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nowLayout"
     android:background="@color/colorPrimary"
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:layout_height="530dp">
- <FrameLayout
-     android:id="@+id/titleLayout"
-     android:layout_width="match_parent"
-     android:layout_height="wrap_content"
-     android:paddingTop="34dp"
-     android:paddingBottom="16dp">
+
+    <FrameLayout
+        android:id="@+id/titleLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="24dp"
+        android:paddingBottom="16dp">
+
+        <ImageView
+            android:id="@+id/navBtn"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="15dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_home"
+            android:scaleType="fitCenter"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            app:tint="@color/white"
+            tools:ignore="ContentDescription" />
      <TextView
        android:id="@+id/placeName"
        android:layout_width="match_parent"

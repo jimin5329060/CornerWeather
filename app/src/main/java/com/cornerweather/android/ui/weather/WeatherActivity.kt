@@ -2,6 +2,7 @@ package com.cornerweather.android.ui.weather
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -12,10 +13,12 @@ import android.widget.TextView
 import android.widget.Toast
 
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -59,6 +62,27 @@ class WeatherActivity : AppCompatActivity() {
 
         Log.d("WeatherActivity", "Weather data: ${viewModel.locationLng}, ${viewModel.locationLat}, ${viewModel.placeName}")
         val swipeRefresh:SwipeRefreshLayout = findViewById(R.id.swipeRefresh)
+        val drawerLayout:DrawerLayout = findViewById<DrawerLayout>(R.id.drawerLayout)
+        findViewById<ImageView>(R.id.navBtn).setOnClickListener {
+            drawerLayout.openDrawer(GravityCompat.START)
+        }
+        drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener{
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+            }
+
+            override fun onDrawerOpened(drawerView: View) {
+            }
+
+            override fun onDrawerClosed(drawerView: View) {
+                // 关闭滑动菜单时隐藏输入法
+                val manager = getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+                manager.hideSoftInputFromWindow(drawerView.windowToken, android.view.inputmethod.InputMethodManager.HIDE_NOT_ALWAYS)
+            }
+
+            override fun onDrawerStateChanged(newState: Int) {
+            }
+        })
+
         viewModel.weatherLiveData.observe(this, Observer{
             result ->
             val  weather = result.getOrNull()
@@ -81,9 +105,21 @@ class WeatherActivity : AppCompatActivity() {
 
     }
     fun  refreshWeather(swipeRefresh:SwipeRefreshLayout){
-
         viewModel.refreshWeather(viewModel.locationLng,viewModel.locationLat)
         swipeRefresh.isRefreshing = true
+    }
+
+    /**
+     * 抽屉里选了新地点：不重建 Activity，就地换地点并刷新。
+     * 城市没变就直接返回，避免白扣一次接口配额。
+     */
+    fun updateWeather(lng: String, lat: String, placeName: String) {
+        if (lng == viewModel.locationLng && lat == viewModel.locationLat) return
+        viewModel.locationLng = lng
+        viewModel.locationLat = lat
+        viewModel.placeName = placeName
+        // 标题文字交给 showWeatherInfo 用 viewModel.placeName 统一刷新
+        refreshWeather(findViewById(R.id.swipeRefresh))
     }
     
 
