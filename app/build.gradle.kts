@@ -3,7 +3,10 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
-
+val KEY_PATH: String by project
+val KEY_PASS: String by project
+val ALISA_NAME: String by project
+val ALISA_PASS: String by project
 android {
     namespace = "com.cornerweather.android"
     compileSdk = 36
@@ -17,6 +20,15 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+    signingConfigs {
+        create("release") {
+            storeFile = file(KEY_PATH)
+            storePassword = KEY_PASS
+            keyAlias = ALISA_NAME
+            keyPassword = ALISA_PASS
+        }
+    }
+
 
     buildTypes {
         release {
@@ -25,6 +37,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
